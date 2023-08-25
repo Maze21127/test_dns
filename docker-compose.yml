@@ -13,6 +13,8 @@ services:
       context: .
     env_file:
       - .env
+    environment:
+      - DEV=False
     container_name: fsp_service
     ports:
       - ${APP_PORT}:8000

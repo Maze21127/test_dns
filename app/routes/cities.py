@@ -1,19 +1,19 @@
-from fastapi import APIRouter, HTTPException, UploadFile
-from fastapi.params import Query, File
+from fastapi import APIRouter, HTTPException, UploadFile, Depends
+from fastapi.params import Query
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from starlette.requests import Request
-from starlette.responses import JSONResponse
 
+from app.database.session import get_db
 from app.schemas import CityCreate, ShortestPathOut, ShortestPathResult, CityOut
-from app.service.cities import create_city, get_all_cities, get_shortest_path, get_city_id, load_cities_from_file, \
-    delete_cities
+from app.service.cities import create_city, get_all_cities, load_cities_from_file, delete_cities
+from app.service.find_distance import get_shortest_path
 
 router = APIRouter(prefix='/cities')
 
 
 @router.post("/", response_model=CityOut)
-async def create(request: Request, city: CityCreate) -> CityOut:
-    new_city = await create_city(city, request.app.state.db)
+async def create(city: CityCreate, db: AsyncSession = Depends(get_db)) -> CityOut:
+    new_city = await create_city(city, db)
     if new_city:
         return new_city
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -21,22 +21,15 @@ async def create(request: Request, city: CityCreate) -> CityOut:
 
 
 @router.get('/', response_model=list[CityOut])
-async def get_all(request: Request) -> list[CityOut]:
-    data = await get_all_cities(request.app.state.db)
+async def get_all(db: AsyncSession = Depends(get_db)) -> list[CityOut]:
+    data = await get_all_cities(db)
     return data
 
 
 @router.get('/{city}/findShortestPath',
             response_model=ShortestPathOut)
-async def get_all(request: Request, city: str, to: str = Query()):
-    db = request.app.state.db
-    city_from_id = await get_city_id(db, city)
-    if not city_from_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City from not found")
-    city_to_id = await get_city_id(db, to)
-    if not city_to_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City to not found")
-    distance = await get_shortest_path(db, city_from_id, city_to_id)
+async def get_all(city: str, to: str = Query(), db: AsyncSession = Depends(get_db)):
+    distance = await get_shortest_path(db, city, to)
     return ShortestPathOut(
         city=city,
         result=ShortestPathResult(distance=distance, targetCity=to)
@@ -44,13 +37,13 @@ async def get_all(request: Request, city: str, to: str = Query()):
 
 
 @router.post('/fromFile', response_model=list[CityOut], status_code=201)
-async def load_cities(request: Request, file: UploadFile) -> list[CityOut]:
+async def load_cities(file: UploadFile, db: AsyncSession = Depends(get_db)) -> list[CityOut]:
     file_data: bytes = await file.read()
-    await load_cities_from_file(file_data, request.app.state.db)
-    data: list[CityOut] = await get_all_cities(request.app.state.db)
+    await load_cities_from_file(file_data, db)
+    data: list[CityOut] = await get_all_cities(db)
     return data
 
 
 @router.delete('/', status_code=204)
-async def delete_all_cities(request: Request):
-    await delete_cities(request.app.state.db)
+async def delete_all_cities(db: AsyncSession = Depends(get_db)):
+    await delete_cities(db)

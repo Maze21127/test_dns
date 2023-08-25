@@ -1,9 +1,4 @@
 from pydantic import BaseModel, Field
-from enum import Enum
-
-
-class DatabaseStatuses(Enum):
-    INSERT_OK = "INSERT 0 1"
 
 
 class ORMModel(BaseModel):
