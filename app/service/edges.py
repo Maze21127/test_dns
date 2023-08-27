@@ -4,7 +4,7 @@ from app.database.dals.edge import EdgeDAL
 from app.schemas import EdgeCreate
 
 
-async def create_edge(body: EdgeCreate, session: AsyncSession):
+async def create_edge(body: EdgeCreate, session: AsyncSession) -> None:
     async with session.begin():
         edge_dal = EdgeDAL(session)
         await edge_dal.create(body)

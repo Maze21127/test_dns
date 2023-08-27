@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,5 +8,5 @@ router = APIRouter(prefix='/edges')
 
 
 @router.delete('/', status_code=204)
-async def delete_all_edges(db: AsyncSession = Depends(get_db)):
+async def delete_all_edges(db: AsyncSession = Depends(get_db)) -> None:
     await delete_edges(db)

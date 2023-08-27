@@ -5,10 +5,6 @@ from app.database.models import Edge
 from app.schemas import EdgeCreate
 
 
-class EdgeAlreadyExists(Exception):
-    """City already exists"""
-
-
 class EdgeDAL:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session

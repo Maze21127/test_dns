@@ -15,7 +15,7 @@ async def _get_city_by_name(name: str, session: AsyncSession) -> CityOut | None:
     return CityOut(id=city.id, name=city.name) if city is not None else None
 
 
-async def get_shortest_path(session: AsyncSession, from_city: str, to_city: str):
+async def get_shortest_path(session: AsyncSession, from_city: str, to_city: str) -> int:
     async with session.begin():
         if not await _get_city_by_name(from_city, session):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City from not found")
@@ -26,7 +26,7 @@ async def get_shortest_path(session: AsyncSession, from_city: str, to_city: str)
     return result
 
 
-async def _load_graph(session: AsyncSession):
+async def _load_graph(session: AsyncSession) -> dict:
     city_dal = CityDAL(session)
     edge_dal = EdgeDAL(session)
     cities = await city_dal.fetch_all()
@@ -41,7 +41,7 @@ async def _load_graph(session: AsyncSession):
     return graph
 
 
-def dijkstra(graph, start, end):
+def dijkstra(graph, start, end) -> int:
     distances = {city_id: float('inf') for city_id in graph}
     distances[start] = 0
     heap = [(0, start)]

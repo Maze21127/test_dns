@@ -28,7 +28,7 @@ async def get_all(db: AsyncSession = Depends(get_db)) -> list[CityOut]:
 
 @router.get('/{city}/findShortestPath',
             response_model=ShortestPathOut)
-async def get_all(city: str, to: str = Query(), db: AsyncSession = Depends(get_db)):
+async def get_all(city: str, to: str = Query(), db: AsyncSession = Depends(get_db)) -> ShortestPathOut:
     distance = await get_shortest_path(db, city, to)
     return ShortestPathOut(
         city=city,
@@ -45,5 +45,5 @@ async def load_cities(file: UploadFile, db: AsyncSession = Depends(get_db)) -> l
 
 
 @router.delete('/', status_code=204)
-async def delete_all_cities(db: AsyncSession = Depends(get_db)):
+async def delete_all_cities(db: AsyncSession = Depends(get_db)) -> None:
     await delete_cities(db)
