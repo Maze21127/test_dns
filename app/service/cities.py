@@ -64,13 +64,13 @@ async def get_city_id(db: Database, city_name: str) -> bool:
     return result[0]['id'] if result else None
 
 
-async def get_shortest_path(db: Database, from_city: int, to_city: int):
+async def get_shortest_path(db: Database, from_city: int, to_city: int) -> int:
     graph = await _load_graph(db)
     result = dijkstra(graph, from_city, to_city)
     return result
 
 
-async def _load_graph(db: Database):
+async def _load_graph(db: Database) -> dict:
     cities = await db.fetch("SELECT * FROM public.city")
     edges = await db.fetch("SELECT * FROM public.edge")
 
@@ -84,7 +84,7 @@ async def _load_graph(db: Database):
     return graph
 
 
-def dijkstra(graph, start, end):
+def dijkstra(graph, start, end) -> int:
     distances = {city_id: float('inf') for city_id in graph}
     distances[start] = 0
     heap = [(0, start)]

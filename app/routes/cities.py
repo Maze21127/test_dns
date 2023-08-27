@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile
-from fastapi.params import Query, File
+from fastapi.params import Query
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 
 from app.schemas import CityCreate, ShortestPathOut, ShortestPathResult, CityOut
 from app.service.cities import create_city, get_all_cities, get_shortest_path, get_city_id, load_cities_from_file, \
@@ -28,7 +27,7 @@ async def get_all(request: Request) -> list[CityOut]:
 
 @router.get('/{city}/findShortestPath',
             response_model=ShortestPathOut)
-async def get_all(request: Request, city: str, to: str = Query()):
+async def get_all(request: Request, city: str, to: str = Query()) -> ShortestPathOut:
     db = request.app.state.db
     city_from_id = await get_city_id(db, city)
     if not city_from_id:
@@ -52,5 +51,5 @@ async def load_cities(request: Request, file: UploadFile) -> list[CityOut]:
 
 
 @router.delete('/', status_code=204)
-async def delete_all_cities(request: Request):
+async def delete_all_cities(request: Request) -> None:
     await delete_cities(request.app.state.db)

@@ -6,12 +6,12 @@ from app.database.session import Database
 from settings import DATABASE_URL
 
 
-async def on_startup():
+async def on_startup() -> None:
     app.state.db = Database(DATABASE_URL)
     await app.state.db.connect()
 
 
-async def on_shutdown():
+async def on_shutdown() -> None:
     await app.state.db.disconnect()
 
 
