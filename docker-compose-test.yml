@@ -1,9 +1,0 @@
-version: "3.7"
-services:
-  db:
-    image: postgres:15
-    container_name: fsp_service_test_db
-    env_file:
-      - .env.test
-    ports:
-      - ${DB_PORT}:5432

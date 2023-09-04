@@ -77,35 +77,31 @@ FSP Service — это FastAPI приложение, которое помога
 git clone ...
 ```
 #### Production
-- Установить переменную окружения DEV
-```bash
-export DEV=False
-```
 - Создание файла .env
 ```bash
 mv .env.dist .env 
 ```
+- Установить DEV=True в файле .env
+
 - Подготовка
   - Заполнить файл .env
   - Запустить команды
 ```bash
 docker-compose build
-docker-compose up
+docker-compose --profile prod
 ```
 - Перейти по адресу http://127.0.0.1:8000/docs (порт из .env)
 
 #### Dev
-- Установить переменную окружения DEV
-```bash
-export DEV=True
-```
+- Установить DEV=True в файле .env
+
 
 - Подготовка
   - При необходимости изменить файл .env.dev
   - Запустить команды
 ```bash
-docker-compose -f docker-compose-dev.yml build
-docker-compose -f docker-compose-dev.yml up
+docker-compose build
+docker-compose --profile dev up
 ```
 Данные команды поднимут тестовую базу данных
 
@@ -187,8 +183,8 @@ export DEV=True
 ```
 Запустить тестовую базу данных
 ```bash
-docker-compose -f docker-compose-test.yml build
-docker-compose -f docker-compose-test.yml up
+docker-compose build
+docker-compose --profile test up
 ```
 Запуск
 ```bash

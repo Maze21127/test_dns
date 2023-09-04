@@ -1,22 +1,53 @@
 version: "3.7"
 services:
-  db:
+  db_prod:
     image: postgres:15
     container_name: fsp_service_db
     env_file:
       - .env
     ports:
       - "5432:5432"
+    profiles:
+      - prod
+
+  db_dev:
+    image: postgres:15
+    container_name: fsp_service_dev_db
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER_DEV}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_DEV}
+      - POSTGRES_DB=${POSTGRES_DB_DEV}
+    ports:
+      - ${DB_PORT_DEV}:5432
+    profiles:
+      - dev
+
+  db_test:
+    image: postgres:15
+    container_name: fsp_service_test_db
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER_TEST}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_TEST}
+      - POSTGRES_DB=${POSTGRES_DB_TEST}
+    ports:
+      - ${DB_PORT_TEST}:5432
+    profiles:
+      - test
 
   app:
     build:
       context: .
     env_file:
       - .env
-    environment:
-      - DEV=False
+
     container_name: fsp_service
     ports:
       - ${APP_PORT}:8000
     depends_on:
-      - db
+      - db_prod
+    profiles:
+      - prod
